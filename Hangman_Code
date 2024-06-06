@@ -1,0 +1,143 @@
+# Hangman Game – Group 3
+
+## 1. Game Initialization
+
+import random
+
+### Hangman stages
+HANGMAN_STAGES = [
+    """
+       -----
+       |   |
+           |
+           |
+           |
+           |
+    ---------
+    """,
+    """
+       -----
+       |   |
+       O   |
+           |
+           |
+           |
+    ---------
+    """,
+    """
+       -----
+       |   |
+       O   |
+       |   |
+           |
+           |
+    ---------
+    """,
+    """
+       -----
+       |   |
+       O   |
+      /|   |
+           |
+           |
+    ---------
+    """,
+    """
+       -----
+       |   |
+       O   |
+      /|\\  |
+           |
+           |
+    ---------
+    """,
+    """
+       -----
+       |   |
+       O   |
+      /|\\  |
+      /    |
+           |
+    ---------
+    """,
+    """
+       -----
+       |   |
+       O   |
+      /|\\  |
+      / \\  |
+           |
+    ---------
+    """
+]
+
+def pick_random_word():
+    word_record = ["write", "that", "program", "python", "hangman"]
+    return random.choice(word_record)
+
+def initialize_game():
+    choosen_word = pick_random_word()
+    return {
+        "choosen_word": choosen_word,
+        "solution_progress": ["*"] * len(choosen_word),
+        "wrong_guesses": 0,
+        "guessed_letters": set()
+    }
+
+## 2. Display Logic
+
+def display_game_state(game_state):
+    print(HANGMAN_STAGES[game_state["wrong_guesses"]])
+    print("Choosen word: ", " ".join(game_state["solution_progress"]))
+    print("Wrong guesses: ", game_state["wrong_guesses"])
+
+## 3. User Input
+
+def get_user_input():
+    return input("Enter a letter: ").lower()
+
+## 4. Game Logic
+
+def process_guess(game_state, guess):
+    choosen_word = game_state["choosen_word"]
+    if guess in game_state["guessed_letters"]:
+        print(f"Letter already guessed '{guess}'")
+    elif guess in choosen_word:
+        print(f"Well done! The letter '{guess}' is part of the word.")
+        game_state["guessed_letters"].add(guess)
+        for index, letter in enumerate(choosen_word):
+            if letter == guess:
+                game_state["solution_progress"][index] = guess
+    else:
+        print(f"The letter '{guess}' is not in the word. Try again")
+        game_state["guessed_letters"].add(guess)
+        game_state["wrong_guesses"] += 1
+
+def check_end_of_game(game_state):
+    if "*" not in game_state["solution_progress"]:
+        print(f"Great! You got it: {''.join(game_state['solution_progress'])}")
+        return True
+    elif game_state["wrong_guesses"] >= 6:
+        print(f"Game over! The solution was: {game_state['choosen_word']}")
+        return True
+    return False
+
+## 5. End of Game
+
+def play_hangman():
+    while True:
+        game_state = initialize_game()
+        print("Let's play Hangman!")
+
+        while not check_end_of_game(game_state):
+            display_game_state(game_state)
+            guess = get_user_input()
+            process_guess(game_state, guess)
+
+        replay = input("Do you want to try again? (yes/no): ").lower()
+        if replay != 'yes':
+            break
+
+if __name__ == "__main__":
+    play_hangman()
+
